@@ -33,4 +33,4 @@ If you want to support this project, leave a ⭐.
 
 ___
 
-This project was created with 💚 by [Carina).
+This project was created with 💚 by Carina).

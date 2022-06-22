@@ -1,18 +1,18 @@
  /// <reference types="Cypress"/>
 
-describe('Central de Atendimento ao Cliente TAT', function() {
+describe('Central de Atendimento ao Cliente TAT',()=> {
    const THERE_SECONDS_IN_MS = 3000 // evitar repetição
-   beforeEach( function(){
+   beforeEach( ()=>{
       cy.visit('./src/index.html')
 
     })
     
-    it('verifica o título da aplicação', function() {
+    it('verifica o título da aplicação', ()=> {
 
       cy.title().should('be.equal','Central de Atendimento ao Cliente TAT')
    })
 
-    it('preenche os campos obrigatórios e envia o formulário', function(){
+    it('preenche os campos obrigatórios e envia o formulário', ()=>{
       const longText = 'exibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválida'
 
       cy.clock()//congela o relogio do navegador
@@ -27,7 +27,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
       cy.get('.success').should('not.be.visible')
    })
 
-   it('exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', function(){
+   it('exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', ()=>{
       cy.clock()
       cy.get('#firstName').type('Carina').should('be.visible').should('have.value','Carina')
       cy.get('#lastName').type('Gouveia')
@@ -39,12 +39,12 @@ describe('Central de Atendimento ao Cliente TAT', function() {
       cy.tick(THERE_SECONDS_IN_MS)
       cy.get('.error').should('not.be.visible')
    })
-   it('campo telefone continua vazio quando preenchido com valor não numerico',function(){
+   it('campo telefone continua vazio quando preenchido com valor não numerico',()=>{
 
       cy.get('#phone').type('ffffffffff').should('have.value','')
    })
 
-   it('exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulário',function(){
+   it('exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulário',()=>{
       cy.clock()
       cy.get('#firstName').type('Carina').should('be.visible').should('have.value','Carina')
       cy.get('#lastName').type('Gouveia')
@@ -59,7 +59,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
 
    })
 
-   it('preenche e limpa os campos nome, sobrenome, email e telefone', function(){
+   it('preenche e limpa os campos nome, sobrenome, email e telefone', ()=>{
       
       cy.get('#firstName').type('Carina')
       .should('have.value','Carina')
@@ -88,7 +88,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
 
   })
 
-  it('exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', function(){
+  it('exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', ()=>{
    cy.clock()
    cy.contains('button', 'Enviar').click()
 
@@ -99,7 +99,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
   })
 
    //Eliminando duplicação de código
-   it('envia o formulário com sucesso usando um comando customizado',function(){
+   it('envia o formulário com sucesso usando um comando customizado',()=>{
       cy.clock()
       cy.fillMantoryFieldsAndSubmit()
 
@@ -109,13 +109,13 @@ describe('Central de Atendimento ao Cliente TAT', function() {
 
    })
 
-   it('seleciona um produt (Youtube) por seu texto',function(){
+   it('seleciona um produt (Youtube) por seu texto',()=>{
       cy.get('#product')
       .select('YouTube')
       .should('have.value','youtube')
    })
 
-   it('seleciona um produt (Youtube) por seu valor',function(){
+   it('seleciona um produt (Youtube) por seu valor',()=>{
       const valSelect = 'mentoria'
       cy.get('#product')
       .select(valSelect)
@@ -208,7 +208,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
   it('Preenche a are de texto usando o comando invoke', ()=>{
      const longText = Cypress._.repeat('Olá ',20)//repeti a string 20x
 
-     cy.get('#open-text-area')//pega a area de texto
+     cy.get('#open-text-area')//Text area
      .invoke('val', longText)//invoca o valor do campo e seta o textLong
      .should('have.value',longText)//verifica se o valor do texto area é igual ao textLong
   })
@@ -224,7 +224,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
    })
   })
 
-  it.only('encontre o gato escondido - Desafio', ()=>{
+  it('encontre o gato escondido - Desafio', ()=>{
    cy.get('#cat')// pego a classe
    .should('not.be.visible')//verifico se está visivel
    .invoke('show')//exibi o elemento na tela

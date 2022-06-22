@@ -1,7 +1,7 @@
  /// <reference types="Cypress"/>
 
 describe('Central de Atendimento ao Cliente TAT', function() {
-
+   const THERE_SECONDS_IN_MS = 3000 // evitar repetição
    beforeEach( function(){
       cy.visit('./src/index.html')
 
@@ -13,25 +13,31 @@ describe('Central de Atendimento ao Cliente TAT', function() {
    })
 
     it('preenche os campos obrigatórios e envia o formulário', function(){
-      const longTest = 'exibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválida'
+      const longText = 'exibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválidaexibe mensagem de erro ao submeter o formulário com um email com formatação inválida'
+
+      cy.clock()//congela o relogio do navegador
       cy.get('#firstName').type('Carina').should('be.visible').should('have.value','Carina')
       cy.get('#lastName').type('Gouveia')
       cy.get('#email').type('carinagouveiabarros@gmail.com')
-      cy.get('#open-text-area').type(longTest,{delay: 0})
+      cy.get('#open-text-area').type(longText,{delay: 0})
       cy.contains('button', 'Enviar').click()
 
       cy.get('.success').should('be.visible')
+      cy.tick(THERE_SECONDS_IN_MS) // avança no tempo 3 milissegundos
+      cy.get('.success').should('not.be.visible')
    })
 
    it('exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', function(){
-
+      cy.clock()
       cy.get('#firstName').type('Carina').should('be.visible').should('have.value','Carina')
       cy.get('#lastName').type('Gouveia')
       cy.get('#email').type('carinagouveiabarros@gmail,com')
       cy.get('#open-text-area').type('teste')
       cy.contains('button', 'Enviar').click()
-      cy.get('.error').should('be.visible')
 
+      cy.get('.error').should('be.visible')
+      cy.tick(THERE_SECONDS_IN_MS)
+      cy.get('.error').should('not.be.visible')
    })
    it('campo telefone continua vazio quando preenchido com valor não numerico',function(){
 
@@ -39,7 +45,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
    })
 
    it('exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulário',function(){
-      
+      cy.clock()
       cy.get('#firstName').type('Carina').should('be.visible').should('have.value','Carina')
       cy.get('#lastName').type('Gouveia')
       cy.get('#email').type('carinagouveiabarros@gmail.com')
@@ -48,6 +54,8 @@ describe('Central de Atendimento ao Cliente TAT', function() {
       cy.contains('button', 'Enviar').click()
 
       cy.get('.error').should('be.visible')
+      cy.tick(THERE_SECONDS_IN_MS)
+      cy.get('.error').should('not.be.visible')
 
    })
 
@@ -81,18 +89,24 @@ describe('Central de Atendimento ao Cliente TAT', function() {
   })
 
   it('exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', function(){
-
+   cy.clock()
    cy.contains('button', 'Enviar').click()
 
    cy.get('.error').should('be.visible')
+   cy.tick(THERE_SECONDS_IN_MS)
+   cy.get('.error').should('not.be.visible')
 
   })
 
    //Eliminando duplicação de código
    it('envia o formulário com sucesso usando um comando customizado',function(){
+      cy.clock()
       cy.fillMantoryFieldsAndSubmit()
 
       cy.get('.success').should('be.visible')
+      cy.tick(THERE_SECONDS_IN_MS)
+      cy.get('.success').should('not.be.visible')
+
    })
 
    it('seleciona um produt (Youtube) por seu texto',function(){
@@ -174,6 +188,52 @@ describe('Central de Atendimento ao Cliente TAT', function() {
    
    cy.contains('Talking About Testing').should('be.visible')
  
+  })
+
+  it('exibi e esconde as mensagens de sucesso e erro usando .invoke', ()=>{
+   cy.get('.success')// pego a classe
+   .should('not.be.visible')//verifico se está visivel
+   .invoke('show')//exibi o elemento na tela
+   .and('contain','Mensagem enviada com sucesso.')// verifica se contém a mensagem
+   .invoke('hide')// removo o elemento da tela
+   .should('not.be.visible')//verifica se está visivel
+   cy.get('.error')// pego a classe
+   .should('not.be.visible')//verifico se está visivel
+   .invoke('show')//exibi o elemento na tela
+   .and('contain','Valide os campos obrigatórios!')// verifica se contém a mensagem
+   .invoke('hide')// removo o elemento da tela
+   .should('not.be.visible')//verifica se está visivel
+  })
+
+  it('Preenche a are de texto usando o comando invoke', ()=>{
+     const longText = Cypress._.repeat('Olá ',20)//repeti a string 20x
+
+     cy.get('#open-text-area')//pega a area de texto
+     .invoke('val', longText)//invoca o valor do campo e seta o textLong
+     .should('have.value',longText)//verifica se o valor do texto area é igual ao textLong
+  })
+  
+  it('faz uma requisição HTTP',()=>{
+
+   cy.request('https://cac-tat.s3.eu-central-1.amazonaws.com/index.html')//requisão a nivel de rede
+   .should(function(response){//verificação
+   const {status, statusText, body} = response//resposta da requisão, desestruturação.
+   expect(status).to.equal(200)
+   expect(statusText).to.equal('OK')
+   expect(body).to.include('CAC TAT')
+   })
+  })
+
+  it.only('encontre o gato escondido - Desafio', ()=>{
+   cy.get('#cat')// pego a classe
+   .should('not.be.visible')//verifico se está visivel
+   .invoke('show')//exibi o elemento na tela
+   .should('be.visible')//verifica se está visivel
+   cy.get('#title')
+   .invoke('text','CAT TAT')
+   cy.get('#subtitle')
+   .invoke('text','Eu 💚 gatos')
+
   })
 
 })
